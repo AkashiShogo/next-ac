@@ -1,0 +1,93 @@
+"use client";
+
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import type { ProblemData } from "@/lib/types";
+
+interface Props {
+  problem: ProblemData | null;
+  onClose: () => void;
+  onComplete: () => Promise<void>;
+}
+
+export function FocusModal({ problem, onClose, onComplete }: Props) {
+  const [completing, setCompleting] = useState(false);
+  const [doneMessage, setDoneMessage] = useState<string | null>(null);
+
+  const MESSAGES = [
+    "お疲れさまでした。",
+    "着実に積み上がっています。",
+    "その一問が、力になります。",
+    "よい集中でした。",
+    "また一つ、越えましたね。",
+    "続けていることが、何より大切です。",
+  ];
+
+  const handleComplete = async () => {
+    setCompleting(true);
+    await onComplete();
+    setCompleting(false);
+    const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
+    setDoneMessage(msg);
+    setTimeout(onClose, 1500);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setDoneMessage(null);
+      onClose();
+    }
+  };
+
+  return (
+    <Dialog open={!!problem} onOpenChange={handleOpenChange}>
+      <DialogContent className="max-w-sm">
+        {problem && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-base">集中モード</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4 pt-1">
+              {/* 問題情報 */}
+              <div className="rounded-lg bg-muted/50 px-4 py-3 space-y-0.5">
+                <p className="text-xs text-muted-foreground font-mono">
+                  {problem.contestId.toUpperCase()} — {problem.index}
+                </p>
+                <p className="font-semibold">{problem.title}</p>
+              </div>
+
+              {doneMessage ? (
+                <div className="flex items-center justify-center py-2 text-sm font-medium">
+                  {doneMessage}
+                </div>
+              ) : (
+                <Button
+                  className="w-full"
+                  onClick={handleComplete}
+                  disabled={completing}
+                >
+                  {completing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      確認中...
+                    </>
+                  ) : (
+                    "解けた"
+                  )}
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
