@@ -11,28 +11,18 @@
 
 🔗 **デモサイト**: https://next-ac-peach.vercel.app/
 
----
-
 ## 📖 About
 
 AtCoder の学習を支える [AtCoder Problems](https://kenkoooo.com/atcoder/) は、豊富な統計・分析機能を備えた素晴らしいツールです。
 Next AC はその API を活用させていただきながら、初心者が感じやすい次のような悩みにフォーカスした補助的なダッシュボードです。
 
-> 「D問題以降は今は関係ない」「どれが次にやるべき問題か分からない」「ACしたのに画面が更新されていない」
+> 「D問題以降は今は関係ない」「どれが次にやるべき問題か分からない」「ACしたのになかなか画面が更新されていない」
 
-**A〜C問題だけに絞って**、いま自分がやるべきことをシンプルに把握することを目的としています。
+**まずはA〜C問題だけに絞って**、いま自分がやるべきことをシンプルに把握することを目的としています。
 
 - 🚫 **ノイズレス** — D問題以降を完全に排除し、今やるべき問題だけを表示
 - ✋ **手入力ゼロ** — ユーザーIDを入力するだけで、提出履歴を自動取得・自動分類
 - ⚡ **ラグなし** — 公式の最新提出をマージし、AC直後にリロードすれば即座に反映
-
-### スクリーンショット
-
-![Table View](./docs/table.png)
-
-![Dashboard View](./docs/dashboard.png)
-
----
 
 ## ✨ Features
 
@@ -56,8 +46,6 @@ D問題以降を排除した**ノイズレスな進捗マトリックス**で、
 AtCoder 公式の最新提出をスクレイピングでマージすることで、**AtCoder で AC した直後にリロードすれば即座に画面へ反映**されます。
 キャッシュによるタイムラグや、手動でのチェック作業は不要です。
 
----
-
 ## 🛠️ Tech Stack
 
 | カテゴリ | 技術 |
@@ -68,8 +56,6 @@ AtCoder 公式の最新提出をスクレイピングでマージすることで
 | UI Components | [shadcn/ui](https://ui.shadcn.com/) |
 | Scraping | [cheerio](https://cheerio.js.org/) |
 | Hosting | [Vercel](https://vercel.com/) |
-
----
 
 ## 🚀 Getting Started
 
@@ -98,9 +84,10 @@ npm run dev
 
 ## 🙏 Acknowledgments
 
-問題データおよびユーザーの提出履歴の取得において、[**kenkoooo/AtCoderProblems**](https://github.com/kenkoooo/AtCoderProblems) の公開 API を利用させていただいています。
+本プロジェクトは、[**kenkoooo/AtCoderProblems**](https://github.com/kenkoooo/AtCoderProblems) の公開 API なしには成立しませんでした。
 
-AtCoder Problems は AtCoder の学習を支える素晴らしいプロジェクトです。開発・運営されている kenkoooo さんをはじめとするコントリビューターの皆さんに感謝いたします。
+AtCoder Problems は、問題データ・ユーザーの提出履歴・難易度推定など、AtCoder 学習に必要な情報を無償で提供し続けてくださっている、コミュニティにとってかけがえのない存在です。
+Next AC はその恩恵を受けて動いているアプリケーションであり、kenkoooo さんをはじめ、長年にわたってこのプロジェクトを支えてくださっているすべてのコントリビューターの皆さんに、心より感謝申し上げます。
 
 ---
 
