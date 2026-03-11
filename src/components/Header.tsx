@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { BookOpen, Pencil, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { BookOpen, Pencil, RotateCcw, Sun, Moon } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { UserIdForm } from "./UserIdForm";
 
@@ -14,6 +15,9 @@ interface Props {
 
 export function Header({ userId, onChangeUserId, onReset }: Props) {
   const [isEditing, setIsEditing] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const handleSave = (newId: string) => {
     onChangeUserId(newId);
@@ -37,6 +41,17 @@ export function Header({ userId, onChangeUserId, onReset }: Props) {
         </div>
 
         <div className="flex items-center gap-2">
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              title="テーマ切り替え"
+            >
+              {resolvedTheme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </Button>
+          )}
           {isEditing ? (
             <UserIdForm
               onSubmit={handleSave}
