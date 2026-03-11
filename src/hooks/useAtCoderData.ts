@@ -1,12 +1,12 @@
 "use client";
 
 import useSWR from "swr";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   KenkoooProblem,
-  ProblemModel,
   KenkoooSubmission,
   ProblemData,
+  ProblemModel,
   ProblemStatus,
 } from "@/lib/types";
 
@@ -35,6 +35,8 @@ function classifyStatus(
 
 export function useAtCoderData(userId: string | null) {
   const isReady = Boolean(userId);
+  // ポーリングで上書きされないよう React state で管理するオプティミスティック AC
+  const [optimisticAcIds, setOptimisticAcIds] = useState<Set<string>>(new Set());
 
   const { data: allProblems, error: problemsError } = useSWR<KenkoooProblem[]>(
     "https://kenkoooo.com/atcoder/resources/problems.json",
@@ -101,7 +103,11 @@ export function useAtCoderData(userId: string | null) {
       const difficulty =
         model?.difficulty != null ? Math.round(model.difficulty) : null;
 
-      const status = userId ? classifyStatus(p.id, allSubs) : "TODO";
+      let status = userId ? classifyStatus(p.id, allSubs) : "TODO";
+      // API が未反映でも、ユーザーが「解けた」と記録した問題は AC 扱い
+      if (optimisticAcIds.has(p.id) && status !== "AC_ONESHOT" && status !== "AC_PENALTY") {
+        status = "AC_ONESHOT";
+      }
 
       return {
         id: p.id,
@@ -113,7 +119,7 @@ export function useAtCoderData(userId: string | null) {
         url: `https://atcoder.jp/contests/${p.contest_id}/tasks/${p.id}`,
       };
     });
-  }, [allProblems, problemModels, historicSubmissions, recentSubmissions, userId]);
+  }, [allProblems, problemModels, historicSubmissions, recentSubmissions, userId, optimisticAcIds]);
 
   const tableData = useMemo(() => {
     const map = new Map<string, Record<"A" | "B" | "C", ProblemData | null>>();
@@ -126,6 +132,19 @@ export function useAtCoderData(userId: string | null) {
     return Array.from(map.entries())
       .sort((a, b) => b[0].localeCompare(a[0]))
       .map(([contestId, cols]) => ({ contestId, cols }));
+  }, [problems]);
+
+  const stats = useMemo(() => {
+    const init = () => ({ ac: 0, trying: 0, todo: 0, total: 0 });
+    const result = { A: init(), B: init(), C: init() };
+    for (const p of problems) {
+      const s = result[p.index];
+      s.total++;
+      if (p.status === "AC_ONESHOT" || p.status === "AC_PENALTY") s.ac++;
+      else if (p.status === "TRYING") s.trying++;
+      else s.todo++;
+    }
+    return result;
   }, [problems]);
 
   const trying = useMemo(
@@ -158,8 +177,30 @@ export function useAtCoderData(userId: string | null) {
 
   const error = problemsError ?? modelsError ?? subsError ?? null;
 
-  // 集中モード完了時に呼ぶ手動リフレッシュ
-  const refresh = async () => { await mutateRecent(); };
+  // API が AC を返してきたら optimisticAcIds から削除
+  useEffect(() => {
+    if (optimisticAcIds.size === 0) return;
+    const allSubs = [...(recentSubmissions ?? []), ...(historicSubmissions ?? [])];
+    const confirmed = [...optimisticAcIds].filter((id) =>
+      allSubs.some((s) => s.problem_id === id && s.result === "AC")
+    );
+    if (confirmed.length > 0) {
+      setOptimisticAcIds((prev) => {
+        const next = new Set(prev);
+        confirmed.forEach((id) => next.delete(id));
+        return next;
+      });
+    }
+  }, [recentSubmissions, historicSubmissions, optimisticAcIds]);
 
-  return { isLoading, error, tableData, trying, todo, cleared, refresh };
+  // 集中モード完了時に呼ぶ手動リフレッシュ（problem を渡すとオプティミスティック更新）
+  const refresh = async (problem?: ProblemData) => {
+    if (problem) {
+      // React state に記録 → ポーリングで上書きされても AC を維持
+      setOptimisticAcIds((prev) => new Set([...prev, problem.id]));
+    }
+    await mutateRecent();
+  };
+
+  return { isLoading, error, tableData, trying, todo, cleared, stats, refresh };
 }

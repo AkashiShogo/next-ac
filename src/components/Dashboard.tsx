@@ -8,11 +8,15 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import type { ProblemData } from "@/lib/types";
+import { StatsChart } from "@/components/StatsChart";
+
+interface StatEntry { ac: number; trying: number; todo: number; total: number; }
 
 interface Props {
   trying: ProblemData[];
   todo: ProblemData[];
   cleared: ProblemData[];
+  stats: { A: StatEntry; B: StatEntry; C: StatEntry };
   onRefresh: () => Promise<void>;
   onFocus: (problem: ProblemData) => void;
 }
@@ -113,9 +117,10 @@ function Section({
   );
 }
 
-export function Dashboard({ trying, todo, cleared, onFocus }: Props) {
+export function Dashboard({ trying, todo, cleared, stats, onFocus }: Props) {
   return (
     <div className="flex flex-col gap-4">
+      <StatsChart stats={stats} />
       {/* やり残し */}
       <Section
         badge={<StatusCell label="TRY" className="bg-red-100 text-red-700" />}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import confetti from "canvas-confetti";
 import { Loader2 } from "lucide-react";
 import {
   Dialog,
@@ -14,12 +15,20 @@ import type { ProblemData } from "@/lib/types";
 interface Props {
   problem: ProblemData | null;
   onClose: () => void;
-  onComplete: () => Promise<void>;
+  onComplete: (problem?: ProblemData) => Promise<void>;
 }
 
 export function FocusModal({ problem, onClose, onComplete }: Props) {
   const [completing, setCompleting] = useState(false);
   const [doneMessage, setDoneMessage] = useState<string | null>(null);
+
+  // 新しい問題が開かれたら状態をリセット
+  useEffect(() => {
+    if (problem) {
+      setDoneMessage(null);
+      setCompleting(false);
+    }
+  }, [problem]);
 
   const MESSAGES = [
     "お疲れさまでした。",
@@ -30,13 +39,26 @@ export function FocusModal({ problem, onClose, onComplete }: Props) {
     "続けていることが、何より大切です。",
   ];
 
+  const fireConfetti = () => {
+    const burst = (x: number) =>
+      confetti({
+        particleCount: 60,
+        spread: 70,
+        origin: { x, y: 0.6 },
+        colors: ["#facc15", "#34d399", "#60a5fa", "#f472b6", "#a78bfa"],
+      });
+    burst(0.35);
+    setTimeout(() => burst(0.65), 150);
+  };
+
   const handleComplete = async () => {
     setCompleting(true);
-    await onComplete();
+    await onComplete(problem ?? undefined);
     setCompleting(false);
+    fireConfetti();
     const msg = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
     setDoneMessage(msg);
-    setTimeout(onClose, 1500);
+    setTimeout(onClose, 2000);
   };
 
   const handleOpenChange = (open: boolean) => {

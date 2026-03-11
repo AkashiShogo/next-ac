@@ -34,7 +34,7 @@ export default function Home() {
     setUserId(null);
   };
 
-  const { isLoading, error, tableData, trying, todo, cleared, refresh } =
+  const { isLoading, error, tableData, trying, todo, cleared, stats, refresh } =
     useAtCoderData(userId);
 
   const [focusProblem, setFocusProblem] = useState<ProblemData | null>(null);
@@ -125,7 +125,7 @@ export default function Home() {
             {isLoading ? (
               <LoadingState message="提出データを読み込み中..." />
             ) : (
-              <Dashboard trying={trying} todo={todo} cleared={cleared} onRefresh={refresh} onFocus={handleFocus} />
+              <Dashboard trying={trying} todo={todo} cleared={cleared} stats={stats} onRefresh={refresh} onFocus={handleFocus} />
             )}
           </TabsContent>
         </Tabs>
