@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, PanelRight } from "lucide-react";
 
 export const metadata = {
-  title: "使い方 | Next-AC",
+  title: "Guide | Next-AC",
 };
 
 export default function GuidePage() {
@@ -14,32 +14,29 @@ export default function GuidePage() {
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        戻る
+        Back
       </Link>
 
-      {/* タイトル */}
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">使い方</h1>
-        <p className="text-sm text-muted-foreground">3ステップで始められます。</p>
       </div>
 
-      {/* ステップ */}
       <ol className="space-y-8">
         {[
           {
             step: "01",
             title: "IDを入力する",
-            lines: ["AtCoder IDを入力するだけ。", "登録もログインも不要です。"],
+            lines: ["AtCoder ID を入力するだけ。", "登録不要。"],
           },
           {
             step: "02",
             title: "次の問題を選ぶ",
-            lines: ["Dashboard の「次のターゲット」から問題をクリック。", "難易度の低い順に並んでいます。"],
+            lines: ["Overview の「Next」から問題をクリック。", "表示は難易度の低い順。"],
           },
           {
             step: "03",
-            title: "解いてリロード",
-            lines: ["ACしたらこのページをリロード。", "進捗がすぐ反映されます。"],
+            title: "解いて「Solved」を押す",
+            lines: ["ACしたら「Solved」を押すだけ。"],
           },
         ].map(({ step, title, lines }) => (
           <li key={step} className="flex gap-5">
@@ -58,24 +55,24 @@ export default function GuidePage() {
         ))}
       </ol>
 
-      {/* 分割画面ヒント */}
       <div className="flex items-start gap-3 border-l-2 pl-4 text-sm text-muted-foreground">
         <PanelRight className="h-4 w-4 shrink-0 mt-0.5" />
-        <p>
-          狭い幅でも十分に使えます。<br />
-          AtCoder の隣に小さく添えておくだけ。
-        </p>
+        <p>狭い幅でも使用できます。<br />AtCoderの隣に並べて使うのがおすすめ。</p>
       </div>
 
-      {/* ステータス */}
+      <div className="flex items-start gap-3 border-l-2 pl-4 text-sm text-muted-foreground">
+        <PanelRight className="h-4 w-4 shrink-0 mt-0.5" />
+        <p>破線のACは確認待ちの表示です。<br />リロードすると消える場合がありますが、<br />しばらくすると正式なACに切り替わります。</p>
+      </div>
+
       <div className="space-y-4">
         <p className="text-sm font-semibold">ステータスの見方</p>
         <div className="space-y-3">
           {[
-            { cell: "–",  cellClass: "bg-zinc-100 text-zinc-400",    label: "未着手" },
-            { cell: "TRY", cellClass: "bg-red-100 text-red-700",     label: "挑戦中 — まだACなし" },
-            { cell: "AC", cellClass: "bg-yellow-100 text-yellow-700", label: "苦戦クリア — 複数回でAC" },
-            { cell: "AC", cellClass: "bg-green-100 text-green-700",   label: "一発クリア — 初回でAC" },
+            { cell: "–",   cellClass: "bg-zinc-100 text-zinc-500",                                       label: "未着手" },
+            { cell: "WA",  cellClass: "bg-red-100 text-red-600",                                         label: "挑戦中 — AC なし" },
+            { cell: "AC",  cellClass: "bg-green-100 text-green-600",                                     label: "クリア" },
+            { cell: "AC",  cellClass: "bg-green-50 text-green-500 border border-dashed border-green-300", label: "クリア（確認中）" },
           ].map(({ cell, cellClass, label }) => (
             <div key={label} className="flex items-center gap-3 text-sm">
               <span className={`inline-block w-10 rounded px-2 py-1 text-center text-xs font-medium shrink-0 ${cellClass}`}>

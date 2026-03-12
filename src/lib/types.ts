@@ -1,4 +1,4 @@
-export type ProblemStatus = "TODO" | "TRYING" | "AC_PENALTY" | "AC_ONESHOT";
+export type ProblemStatus = "TODO" | "TRYING" | "AC_PENALTY" | "AC_ONESHOT" | "AC_OPTIMISTIC";
 
 /** kenkoooo problems.json の1エントリ */
 export interface KenkoooProblem {

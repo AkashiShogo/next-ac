@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { ProblemData, ProblemStatus } from "@/lib/types";
+import type { ProblemData } from "@/lib/types";
+import { STATUS_STYLE, STATUS_LABEL } from "@/lib/status";
 
 interface TableRow {
   contestId: string;
@@ -16,20 +17,6 @@ interface Props {
   onFocus: (problem: ProblemData) => void;
 }
 
-const STATUS_STYLE: Record<ProblemStatus, string> = {
-  TODO: "bg-zinc-100 text-zinc-400 hover:bg-zinc-200",
-  TRYING: "bg-red-100 text-red-700 hover:bg-red-200",
-  AC_PENALTY: "bg-yellow-100 text-yellow-700 hover:bg-yellow-200",
-  AC_ONESHOT: "bg-green-100 text-green-700 hover:bg-green-200",
-};
-
-const STATUS_LABEL: Record<ProblemStatus, string> = {
-  TODO: "–",
-  TRYING: "WA",
-  AC_PENALTY: "AC",
-  AC_ONESHOT: "AC",
-};
-
 function ProblemCell({
   problem,
   onFocus,
@@ -38,7 +25,7 @@ function ProblemCell({
   onFocus: (problem: ProblemData) => void;
 }) {
   if (!problem) {
-    return <td className="p-1.5 text-center"><div className="h-8 rounded bg-zinc-50" /></td>;
+    return <td className="p-1.5 text-center"><div className="h-8 rounded bg-zinc-50 dark:bg-zinc-700/40" /></td>;
   }
 
   return (
@@ -54,30 +41,19 @@ function ProblemCell({
   );
 }
 
-function ContestTable({ rows, ascending, onToggle, onFocus }: {
+function ContestTable({ rows, ascending, onFocus }: {
   rows: TableRow[];
   ascending: boolean;
-  onToggle: () => void;
   onFocus: (problem: ProblemData) => void;
 }) {
   const sorted = ascending ? [...rows].reverse() : rows;
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse">
+      <table className="w-full text-sm border-collapse table-fixed">
         <thead>
           <tr className="border-b">
-            <th className="p-2 text-left font-medium text-muted-foreground">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 gap-1 px-2 text-xs"
-                onClick={onToggle}
-              >
-                Contest
-                <ArrowUpDown className="h-3 w-3" />
-              </Button>
-            </th>
+            <th className="p-2 text-left font-medium text-muted-foreground" />
             {(["A", "B", "C"] as const).map((col) => (
               <th key={col} className="p-2 text-center font-medium w-20">
                 {col}
@@ -135,20 +111,30 @@ export function TableView({ tableData, onFocus }: Props) {
 
   return (
     <Tabs defaultValue={defaultTab}>
-      <TabsList className="mb-4 flex-wrap h-auto gap-1">
-        {groups.map(({ label }) => (
-          <TabsTrigger key={label} value={label} className="text-xs">
-            {label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="flex items-center justify-between mb-2">
+        <TabsList className="flex-wrap h-auto gap-1">
+          {groups.map(({ label }) => (
+            <TabsTrigger key={label} value={label} className="text-xs">
+              {label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 gap-1 px-2 text-xs text-muted-foreground shrink-0"
+          onClick={() => setAscending((v) => !v)}
+        >
+          Contest
+          <ArrowUpDown className="h-3 w-3" />
+        </Button>
+      </div>
 
       {groups.map(({ label, rows }) => (
         <TabsContent key={label} value={label}>
           <ContestTable
             rows={rows}
             ascending={ascending}
-            onToggle={() => setAscending((v) => !v)}
             onFocus={onFocus}
           />
         </TabsContent>

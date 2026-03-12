@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, Pencil, RotateCcw, Sun, Moon } from "lucide-react";
+import { BookOpen, RotateCcw, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export function Header({ userId, onChangeUserId, onReset }: Props) {
     <header className="border-b bg-background sticky top-0 z-10">
       <div className="mx-auto max-w-5xl flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-4">
-          <Link href="/" className="font-bold tracking-tight hover:opacity-80 shrink-0">
+          <Link href="/" className="text-xl font-bold tracking-tight hover:opacity-80 shrink-0">
             Next-AC
           </Link>
           <Link
@@ -36,7 +36,6 @@ export function Header({ userId, onChangeUserId, onReset }: Props) {
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors shrink-0"
           >
             <BookOpen className="h-3.5 w-3.5" />
-            使い方
           </Link>
         </div>
 
@@ -61,18 +60,13 @@ export function Header({ userId, onChangeUserId, onReset }: Props) {
             />
           ) : (
             <>
-              <span className="text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{userId}</span>
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
+              <button
                 onClick={() => setIsEditing(true)}
-                title="IDを変更"
+                className="text-sm font-medium leading-none hover:text-muted-foreground transition-colors"
+                title="ID変更"
               >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
+                {userId}
+              </button>
               <Button
                 variant="ghost"
                 size="icon"

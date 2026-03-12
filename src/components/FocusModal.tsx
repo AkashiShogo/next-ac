@@ -74,7 +74,7 @@ export function FocusModal({ problem, onClose, onComplete }: Props) {
         {problem && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-base">集中モード</DialogTitle>
+              <DialogTitle className="text-base">Focus</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-4 pt-1">
@@ -86,26 +86,28 @@ export function FocusModal({ problem, onClose, onComplete }: Props) {
                 <p className="font-semibold">{problem.title}</p>
               </div>
 
-              {doneMessage ? (
-                <div className="flex items-center justify-center py-2 text-sm font-medium">
-                  {doneMessage}
-                </div>
-              ) : (
-                <Button
-                  className="w-full"
-                  onClick={handleComplete}
-                  disabled={completing}
-                >
-                  {completing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      確認中...
-                    </>
-                  ) : (
-                    "解けた"
-                  )}
-                </Button>
-              )}
+              <div className="h-14 w-full">
+                {doneMessage ? (
+                  <div className="flex h-full items-center justify-center text-sm font-medium">
+                    {doneMessage}
+                  </div>
+                ) : (
+                  <Button
+                    className="w-full h-full text-base"
+                    onClick={handleComplete}
+                    disabled={completing}
+                  >
+                    {completing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Checking...
+                      </>
+                    ) : (
+                      "Solved"
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
           </>
         )}

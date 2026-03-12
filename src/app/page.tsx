@@ -34,13 +34,19 @@ export default function Home() {
     setUserId(null);
   };
 
-  const { isLoading, error, tableData, trying, todo, cleared, stats, refresh } =
+  const { isLoading, error, tableData, trying, todo, cleared, stats, refresh, justConfirmed, clearConfirmed } =
     useAtCoderData(userId);
+
+  useEffect(() => {
+    if (!justConfirmed) return;
+    const timer = setTimeout(clearConfirmed, 5000);
+    return () => clearTimeout(timer);
+  }, [justConfirmed, clearConfirmed]);
 
   const [focusProblem, setFocusProblem] = useState<ProblemData | null>(null);
 
   const handleFocus = (problem: ProblemData) => {
-    window.open(problem.url, "_blank", "noopener,noreferrer");
+    window.open(problem.url, "_blank", "noopener,noreferrer,width=1200,height=800");
     setFocusProblem(problem);
   };
 
@@ -57,7 +63,7 @@ export default function Home() {
             精進に、迷いはいらない。
           </p>
           <p className="text-sm text-muted-foreground">
-            AtCoder ABC の次に解くべき問題が、すぐわかる。
+            AtCoder Beginner Contest の A・B・C 問題に絞って、<br />未解答を整理し、次の一問をすぐ見つける。
           </p>
           <div className="flex flex-wrap justify-center gap-4 pt-1 text-sm text-muted-foreground">
             {["登録不要", "ログイン不要", "無料"].map((label) => (
@@ -69,18 +75,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ID入力フォーム */}
-        <div className="w-full max-w-sm rounded-xl border bg-card p-6 shadow-sm space-y-4">
-          <p className="text-sm font-medium text-center">AtCoder IDを入力して始める</p>
-          <UserIdForm onSubmit={handleSetUserId} />
-        </div>
+        <UserIdForm onSubmit={handleSetUserId} />
 
         {/* 使い方リンク */}
         <Link
           href="/guide"
           className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
         >
-          使い方を見る →
+          使い方 →
         </Link>
       </div>
     );
@@ -94,38 +96,38 @@ export default function Home() {
         onReset={handleReset}
       />
 
-      <main className="mx-auto max-w-5xl px-4 py-6">
+      <main className="mx-auto max-w-5xl px-4 py-2">
         {error && (
           <div className="mb-4 rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
             データの取得中にエラーが発生しました。しばらく待ってから再読み込みしてください。
           </div>
         )}
 
-        <Tabs defaultValue="table">
-          <TabsList className="mb-4">
-            <TabsTrigger value="table" className="gap-1.5">
-              <TableProperties className="h-3.5 w-3.5" />
-              Table
-            </TabsTrigger>
+        <Tabs defaultValue="dashboard">
+          <TabsList>
             <TabsTrigger value="dashboard" className="gap-1.5">
               <LayoutDashboard className="h-3.5 w-3.5" />
-              Dashboard
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="table" className="gap-1.5">
+              <TableProperties className="h-3.5 w-3.5" />
+              Log
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dashboard">
+            {isLoading ? (
+              <LoadingState message="提出データを読み込み中..." />
+            ) : (
+              <Dashboard trying={trying} todo={todo} stats={stats} onRefresh={refresh} onFocus={handleFocus} />
+            )}
+          </TabsContent>
 
           <TabsContent value="table">
             {isLoading ? (
               <LoadingState message="問題データを読み込み中..." />
             ) : (
               <TableView tableData={tableData} onFocus={handleFocus} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="dashboard">
-            {isLoading ? (
-              <LoadingState message="提出データを読み込み中..." />
-            ) : (
-              <Dashboard trying={trying} todo={todo} cleared={cleared} stats={stats} onRefresh={refresh} onFocus={handleFocus} />
             )}
           </TabsContent>
         </Tabs>
@@ -136,6 +138,19 @@ export default function Home() {
         onClose={() => setFocusProblem(null)}
         onComplete={refresh}
       />
+
+      {justConfirmed && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-lg border bg-card px-4 py-3 shadow-lg text-sm">
+          <span className="text-green-600 dark:text-green-400">ACを確認しました。リロードしても大丈夫です。</span>
+          <button
+            onClick={clearConfirmed}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="閉じる"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

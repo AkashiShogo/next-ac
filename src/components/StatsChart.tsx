@@ -25,7 +25,7 @@ function DonutChart({ label, stat }: DonutProps) {
     <div className="flex flex-col items-center gap-1">
       <svg width={112} height={112} viewBox="0 0 112 112">
         {/* 背景トラック */}
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth={8} />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="currentColor" strokeWidth={8} className="text-zinc-200 dark:text-zinc-600" />
         {/* AC 進捗 */}
         <circle
           cx={cx}
@@ -63,11 +63,11 @@ interface Props {
 export function StatsChart({ stats }: Props) {
   return (
     <section className="rounded-lg border bg-card px-4 py-4">
-      <h2 className="text-sm font-semibold mb-4">完了率</h2>
+      <h2 className="text-sm font-semibold mb-4">Progress</h2>
       <div className="flex justify-around">
-        <DonutChart label="A問題" stat={stats.A} />
-        <DonutChart label="B問題" stat={stats.B} />
-        <DonutChart label="C問題" stat={stats.C} />
+        <DonutChart label="A" stat={stats.A} />
+        <DonutChart label="B" stat={stats.B} />
+        <DonutChart label="C" stat={stats.C} />
       </div>
     </section>
   );

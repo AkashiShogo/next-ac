@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import type { ProblemData } from "@/lib/types";
 import { StatsChart } from "@/components/StatsChart";
@@ -14,8 +8,7 @@ interface StatEntry { ac: number; trying: number; todo: number; total: number; }
 
 interface Props {
   trying: ProblemData[];
-  todo: ProblemData[];
-  cleared: ProblemData[];
+  todo: { A: ProblemData[]; B: ProblemData[]; C: ProblemData[] };
   stats: { A: StatEntry; B: StatEntry; C: StatEntry };
   onRefresh: () => Promise<void>;
   onFocus: (problem: ProblemData) => void;
@@ -117,61 +110,62 @@ function Section({
   );
 }
 
-export function Dashboard({ trying, todo, cleared, stats, onFocus }: Props) {
+export function Dashboard({ trying, todo, stats, onFocus }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <StatsChart stats={stats} />
       {/* やり残し */}
-      <Section
-        badge={<StatusCell label="TRY" className="bg-red-100 text-red-700" />}
-        title="挑戦中"
-        count={trying.length}
-        empty="なし"
-      >
-        {trying.map((p) => (
-          <ProblemLink key={p.id} problem={p} onClick={() => onFocus(p)} />
-        ))}
-      </Section>
+      {trying.length > 0 && (
+        <Section
+          badge={<StatusCell label="WA" className="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400" />}
+          title="In Progress"
+          count={trying.length}
+          empty="—"
+        >
+          {trying.map((p) => (
+            <ProblemLink key={p.id} problem={p} onClick={() => onFocus(p)} />
+          ))}
+        </Section>
+      )}
 
       {/* 次の問題 */}
-      <Section
-        badge={<StatusCell label="–" className="bg-zinc-100 text-zinc-400" />}
-        title="次の問題"
-        count={todo.length}
-        empty="なし"
-      >
-        {todo.map((p) => (
-          <ProblemLink key={p.id} problem={p} onClick={() => onFocus(p)} />
-        ))}
-      </Section>
-
-      {/* クリア済みログ */}
       <section className="rounded-lg border bg-card">
-        <Accordion type="single" collapsible>
-          <AccordionItem value="cleared" className="border-none">
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <StatusCell label="AC" className="bg-green-100 text-green-700" />
-                <span className="font-semibold text-sm">クリア済み</span>
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  {cleared.length}
-                </Badge>
+        <div className="flex items-center gap-2 px-4 py-3 border-b">
+          <h2 className="font-semibold text-sm">Next</h2>
+        </div>
+        <div className="grid grid-cols-3 divide-x">
+          {(["A", "B", "C"] as const).map((idx) => (
+            <div key={idx}>
+              <div className="px-3 py-1.5 text-xs font-semibold text-muted-foreground border-b">
+                {idx}
               </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-0">
-              <div className="divide-y border-t">
-                {cleared.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-muted-foreground">
-                    なし
-                  </p>
+              <div className="divide-y">
+                {todo[idx].length === 0 ? (
+                  <p className="px-3 py-2 text-xs text-muted-foreground">—</p>
                 ) : (
-                  cleared.map((p) => <ProblemLink key={p.id} problem={p} />)
+                  todo[idx].map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => onFocus(p)}
+                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-muted transition-colors"
+                      title={p.title}
+                    >
+                      <span className="font-mono text-muted-foreground block">{p.contestId.toUpperCase()}</span>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="truncate">{p.title}</span>
+                        {p.difficulty !== null && (
+                          <span className="text-muted-foreground shrink-0 ml-auto">{p.difficulty < 400 ? "Grey" : p.difficulty}</span>
+                        )}
+                      </div>
+                    </button>
+                  ))
                 )}
               </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+            </div>
+          ))}
+        </div>
       </section>
+
     </div>
   );
 }

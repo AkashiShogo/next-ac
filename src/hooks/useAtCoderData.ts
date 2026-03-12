@@ -104,9 +104,9 @@ export function useAtCoderData(userId: string | null) {
         model?.difficulty != null ? Math.round(model.difficulty) : null;
 
       let status = userId ? classifyStatus(p.id, allSubs) : "TODO";
-      // API が未反映でも、ユーザーが「解けた」と記録した問題は AC 扱い
+      // API が未反映でも、ユーザーが「解けた」と記録した問題は暫定 AC 扱い
       if (optimisticAcIds.has(p.id) && status !== "AC_ONESHOT" && status !== "AC_PENALTY") {
-        status = "AC_ONESHOT";
+        status = "AC_OPTIMISTIC";
       }
 
       return {
@@ -140,7 +140,7 @@ export function useAtCoderData(userId: string | null) {
     for (const p of problems) {
       const s = result[p.index];
       s.total++;
-      if (p.status === "AC_ONESHOT" || p.status === "AC_PENALTY") s.ac++;
+      if (p.status === "AC_ONESHOT" || p.status === "AC_PENALTY" || p.status === "AC_OPTIMISTIC") s.ac++;
       else if (p.status === "TRYING") s.trying++;
       else s.todo++;
     }
@@ -153,15 +153,21 @@ export function useAtCoderData(userId: string | null) {
   );
 
   const todo = useMemo(() => {
+    const sortByDifficulty = (list: ProblemData[]) =>
+      [...list]
+        .sort((a, b) => {
+          if (a.difficulty === null && b.difficulty === null) return 0;
+          if (a.difficulty === null) return 1;
+          if (b.difficulty === null) return -1;
+          return a.difficulty - b.difficulty;
+        })
+        .slice(0, 3);
     const todoList = problems.filter((p) => p.status === "TODO");
-    return [...todoList]
-      .sort((a, b) => {
-        if (a.difficulty === null && b.difficulty === null) return 0;
-        if (a.difficulty === null) return 1;
-        if (b.difficulty === null) return -1;
-        return a.difficulty - b.difficulty;
-      })
-      .slice(0, 10);
+    return {
+      A: sortByDifficulty(todoList.filter((p) => p.index === "A")),
+      B: sortByDifficulty(todoList.filter((p) => p.index === "B")),
+      C: sortByDifficulty(todoList.filter((p) => p.index === "C")),
+    };
   }, [problems]);
 
   const cleared = useMemo(
@@ -177,6 +183,8 @@ export function useAtCoderData(userId: string | null) {
 
   const error = problemsError ?? modelsError ?? subsError ?? null;
 
+  const [justConfirmed, setJustConfirmed] = useState(false);
+
   // API が AC を返してきたら optimisticAcIds から削除
   useEffect(() => {
     if (optimisticAcIds.size === 0) return;
@@ -190,6 +198,7 @@ export function useAtCoderData(userId: string | null) {
         confirmed.forEach((id) => next.delete(id));
         return next;
       });
+      setJustConfirmed(true);
     }
   }, [recentSubmissions, historicSubmissions, optimisticAcIds]);
 
@@ -202,5 +211,5 @@ export function useAtCoderData(userId: string | null) {
     await mutateRecent();
   };
 
-  return { isLoading, error, tableData, trying, todo, cleared, stats, refresh };
+  return { isLoading, error, tableData, trying, todo, cleared, stats, refresh, justConfirmed, clearConfirmed: () => setJustConfirmed(false) };
 }
