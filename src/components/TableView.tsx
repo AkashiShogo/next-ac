@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { ArrowUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ProblemData } from "@/lib/types";
 import { STATUS_STYLE, STATUS_LABEL } from "@/lib/status";
@@ -41,9 +40,10 @@ function ProblemCell({
   );
 }
 
-function ContestTable({ rows, ascending, onFocus }: {
+function ContestTable({ rows, ascending, onToggleSort, onFocus }: {
   rows: TableRow[];
   ascending: boolean;
+  onToggleSort: () => void;
   onFocus: (problem: ProblemData) => void;
 }) {
   const sorted = ascending ? [...rows].reverse() : rows;
@@ -53,7 +53,15 @@ function ContestTable({ rows, ascending, onFocus }: {
       <table className="w-full text-sm border-collapse table-fixed">
         <thead>
           <tr className="border-b">
-            <th className="p-2 text-left font-medium text-muted-foreground" />
+            <th className="p-2 text-left font-medium text-muted-foreground">
+              <button
+                onClick={onToggleSort}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contest
+                <ArrowUpDown className="h-3 w-3" />
+              </button>
+            </th>
             {(["A", "B", "C"] as const).map((col) => (
               <th key={col} className="p-2 text-center font-medium w-20">
                 {col}
@@ -83,10 +91,10 @@ function contestNumber(contestId: string): number {
   return parseInt(contestId.replace(/\D/g, ""), 10) || 0;
 }
 
-/** 番号から100番台グループのラベルを生成: 300 → "300-399" */
-function groupLabel(base: number): string {
-  if (base === 0) return `001-099`;
-  return `${base}-${base + 99}`;
+/** 番号から100番台グループのラベルを生成: 実際の最大値を上限にする */
+function groupLabel(base: number, max: number): string {
+  const lo = base === 0 ? 1 : base;
+  return `${String(lo).padStart(3, "0")}-${String(max).padStart(3, "0")}`;
 }
 
 export function TableView({ tableData, onFocus }: Props) {
@@ -104,37 +112,30 @@ export function TableView({ tableData, onFocus }: Props) {
     // 降順（新しいグループが先頭）
     return Array.from(map.entries())
       .sort((a, b) => b[0] - a[0])
-      .map(([base, rows]) => ({ base, label: groupLabel(base), rows }));
+      .map(([base, rows]) => {
+        const max = Math.max(...rows.map((r) => contestNumber(r.contestId)));
+        return { base, label: groupLabel(base, max), rows };
+      });
   }, [tableData]);
 
   const defaultTab = groups[0]?.label ?? "";
 
   return (
     <Tabs defaultValue={defaultTab}>
-      <div className="flex items-center justify-between mb-2">
-        <TabsList className="flex-wrap h-auto gap-1">
-          {groups.map(({ label }) => (
-            <TabsTrigger key={label} value={label} className="text-xs">
-              {label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 gap-1 px-2 text-xs text-muted-foreground shrink-0"
-          onClick={() => setAscending((v) => !v)}
-        >
-          Contest
-          <ArrowUpDown className="h-3 w-3" />
-        </Button>
-      </div>
+      <TabsList className="flex-wrap h-auto gap-1 mb-2">
+        {groups.map(({ label }) => (
+          <TabsTrigger key={label} value={label} className="text-xs">
+            {label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
 
       {groups.map(({ label, rows }) => (
         <TabsContent key={label} value={label}>
           <ContestTable
             rows={rows}
             ascending={ascending}
+            onToggleSort={() => setAscending((v) => !v)}
             onFocus={onFocus}
           />
         </TabsContent>
