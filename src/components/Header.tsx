@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { UserIdForm } from "./UserIdForm";
+import { CoffeeACIcon } from "./CoffeeACIcon";
 
 interface Props {
   userId: string;
@@ -28,8 +29,13 @@ export function Header({ userId, onChangeUserId, onReset }: Props) {
     <header className="border-b bg-background sticky top-0 z-10">
       <div className="mx-auto max-w-5xl flex items-center justify-between px-4 h-14">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold tracking-tight hover:opacity-80 shrink-0">
-            Next-AC
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 shrink-0">
+            <CoffeeACIcon size={28} />
+            <span className="text-xl font-bold tracking-tight">
+              <span className="text-slate-800 dark:text-slate-100">Next</span>
+              <span className="text-slate-400 mx-0.5">-</span>
+              <span className="text-[#2ecc71]">AC</span>
+            </span>
           </Link>
           <Link
             href="/guide"

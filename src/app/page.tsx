@@ -6,6 +6,7 @@ import { Check, LayoutDashboard, TableProperties } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Header } from "@/components/Header";
 import { UserIdForm } from "@/components/UserIdForm";
+import { CoffeeACIcon } from "@/components/CoffeeACIcon";
 import { TableView } from "@/components/TableView";
 import { Dashboard } from "@/components/Dashboard";
 import { FocusModal } from "@/components/FocusModal";
@@ -58,7 +59,14 @@ export default function Home() {
       <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-4">
         {/* サービス紹介 */}
         <div className="text-center space-y-3 max-w-sm">
-          <h1 className="text-3xl font-bold tracking-tight">Next - AC</h1>
+          <div className="flex flex-col items-center gap-2">
+            <CoffeeACIcon size={72} />
+            <h1 className="text-3xl font-bold tracking-tight">
+              <span className="text-slate-800 dark:text-slate-100">Next</span>
+              <span className="text-slate-400 mx-1">-</span>
+              <span className="text-[#2ecc71]">AC</span>
+            </h1>
+          </div>
           <p className="text-lg font-medium">
             精進に、迷いはいらない。
           </p>
