@@ -49,7 +49,8 @@ function ContestTable({ rows, ascending, onToggleSort, onFocus }: {
   const sorted = ascending ? [...rows].reverse() : rows;
 
   return (
-    <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-11.5rem)]">
+    <div className="overflow-x-auto">
+      {/* 固定ヘッダー */}
       <table className="w-full text-sm border-collapse table-fixed">
         <thead>
           <tr className="border-b">
@@ -69,19 +70,24 @@ function ContestTable({ rows, ascending, onToggleSort, onFocus }: {
             ))}
           </tr>
         </thead>
-        <tbody>
-          {sorted.map(({ contestId, cols }) => (
-            <tr key={contestId} className="border-b hover:bg-muted/30">
-              <td className="p-2 font-mono text-xs text-muted-foreground">
-                {contestId.toUpperCase()}
-              </td>
-              <ProblemCell problem={cols.A} onFocus={onFocus} />
-              <ProblemCell problem={cols.B} onFocus={onFocus} />
-              <ProblemCell problem={cols.C} onFocus={onFocus} />
-            </tr>
-          ))}
-        </tbody>
       </table>
+      {/* スクロール対象のbody */}
+      <div className="overflow-y-auto max-h-[calc(100vh-14rem)]">
+        <table className="w-full text-sm border-collapse table-fixed">
+          <tbody>
+            {sorted.map(({ contestId, cols }) => (
+              <tr key={contestId} className="border-b hover:bg-muted/30">
+                <td className="p-2 font-mono text-xs text-muted-foreground">
+                  {contestId.toUpperCase()}
+                </td>
+                <ProblemCell problem={cols.A} onFocus={onFocus} />
+                <ProblemCell problem={cols.B} onFocus={onFocus} />
+                <ProblemCell problem={cols.C} onFocus={onFocus} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
