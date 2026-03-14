@@ -49,9 +49,9 @@ function ContestTable({ rows, ascending, onToggleSort, onFocus }: {
   const sorted = ascending ? [...rows].reverse() : rows;
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-11.5rem)]">
       <table className="w-full text-sm border-collapse table-fixed">
-        <thead>
+        <thead className="sticky top-0 bg-background">
           <tr className="border-b">
             <th className="p-2 text-left font-medium text-muted-foreground">
               <button
